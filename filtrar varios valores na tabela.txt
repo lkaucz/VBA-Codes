@@ -1,0 +1,22 @@
+Sub filt()
+
+Dim valores As Range
+
+Set valores = Application.InputBox("valores:", Type:=8)
+
+i = valores.Count
+
+ReDim mat(1 To i) As String
+
+For Each cell In valores
+    j = j + 1
+    mat(j) = cell.Value
+Next
+
+
+Range("A1").AutoFilter _
+ Field:=1, _
+ Criteria1:=mat(), _
+ Operator:=xlFilterValues
+ 
+End Sub

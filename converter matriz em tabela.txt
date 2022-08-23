@@ -1,0 +1,24 @@
+Sub ConvertTable()
+'Update 20150512
+Dim Rng As Range
+Dim cRng As Range
+Dim rRng As Range
+Dim xOutRng As Range
+xTitleId = "KutoolsforExcel"
+Set cRng = Application.InputBox("Select your Column labels", xTitleId, Type:=8)
+Set rRng = Application.InputBox("Select Your Row Labels", xTitleId, Type:=8)
+Set Rng = Application.InputBox("Select your data", xTitleId, Type:=8)
+Set outRng = Application.InputBox("Out put to (single cell):", xTitleId, Type:=8)
+Set xWs = Rng.Worksheet
+k = 1
+xColumns = rRng.Column
+xRow = cRng.Row
+For i = Rng.Rows(1).Row To Rng.Rows(1).Row + Rng.Rows.Count - 1
+    For j = Rng.Columns(1).Column To Rng.Columns(1).Column + Rng.Columns.Count - 1
+        outRng.Cells(k, 1) = xWs.Cells(i, xColumns)
+        outRng.Cells(k, 2) = xWs.Cells(xRow, j)
+        outRng.Cells(k, 3) = xWs.Cells(i, j)
+        k = k + 1
+    Next j
+Next i
+End Sub

@@ -1,0 +1,27 @@
+
+Sub extraircaracternovalinha()
+
+Dim char, text, n As Integer
+
+Dim cell_1, k1, k2 As String
+
+n = 1000
+
+For i = 1 To n
+    cell_1 = range("B" & i)
+    char = InStr(cell_1, "/")
+   
+    If char <> 0 Then
+      
+        text = Len(cell_1)
+        k1 = Mid(cell_1, 1, char - 1)
+        k2 = Mid(cell_1, char + 1, text - char)
+        
+        range("B" & i).Select
+        Selection.EntireRow.Insert
+        range("B" & i) = k1
+        range("B" & i + 1) = k2
+    End If
+Next
+
+End Sub

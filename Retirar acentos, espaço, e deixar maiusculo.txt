@@ -1,0 +1,94 @@
+Sub extraçao()
+
+Dim cidade, Acento As String
+
+codiA = "àáâãäèéêëìíîïòóôõöùúûüÀÁÂÃÄÈÉÊËÌÍÎÒÓÔÕÖÙÚÛÜçÇñÑ"
+
+codiB = "aaaaaeeeeiiiiooooouuuuAAAAAEEEEIIIOOOOOUUUUcCnN"
+
+For i = 3 To 6
+
+    cidade = Cells(i, 2)
+        
+        For k = 1 To Len(cidade)
+        
+            p = InStr(codiA, Mid(cidade, k, 1))
+        
+            If p > 0 Then Mid(cidade, k, 1) = Mid(codiB, p, 1)
+        
+        Next
+    
+    Cells(i, 3) = cidade
+    
+    Cells(i, 3).Value = UCase(Cells(i, 3).Value)
+    
+    Cells(i, 3).Select
+     ActiveCell.Replace What:=" ", Replacement:="", LookAt:=xlPart, _
+        SearchOrder:=xlByRows, MatchCase:=False, SearchFormat:=False, _
+        ReplaceFormat:=False, FormulaVersion:=xlReplaceFormula2
+    Cells.Find(What:=" ", After:=ActiveCell, LookIn:=xlFormulas2, LookAt:= _
+        xlPart, SearchOrder:=xlByRows, SearchDirection:=xlNext, MatchCase:=False _
+        , SearchFormat:=False).Activate
+    
+    
+    
+        
+Next
+
+
+End Sub
+
+
+
+
+
+EESE DEIXA APENAS A PRIMEIRA LETRA APÓS O ESPAÇO EM MAIUSCULO
+Sub extraçao()
+
+Dim name_f, Acento As String
+
+codiA = "àáâãäèéêëìíîïòóôõöùúûüÀÁÂÃÄÈÉÊËÌÍÎÒÓÔÕÖÙÚÛÜçÇñÑ"
+
+codiB = "aaaaaeeeeiiiiooooouuuuAAAAAEEEEIIIOOOOOUUUUcCnN"
+
+espaço = " "
+
+n_linha = Cells(Rows.Count, 2).End(xlUp).Row
+
+For i = 2 To n_linha
+
+    name_f = Cells(i, 2)
+        
+        For k = 1 To Len(name_f)
+        
+            p = InStr(codiA, Mid(name_f, k, 1))
+        
+            If p > 0 Then
+            
+                Mid(name_f, k, 1) = Mid(codiB, p, 1)
+            End If
+            
+            p1 = InStr(espaço, Mid(name_f, k, 1))
+            
+            If p1 > 0 Then
+                Mid(name_f, k + 1, 1) = UCase(Mid(name_f, k + 1, 1))
+            End If
+            
+        Next
+        
+    Mid(name_f, 1, 1) = UCase(Mid(name_f, 1, 1))
+    
+    Cells(i, 2) = name_f
+    
+    
+    
+    
+    Cells(i, 2).Replace What:=" ", Replacement:="", LookAt:=xlPart, _
+        SearchOrder:=xlByRows, MatchCase:=False, SearchFormat:=False, _
+        ReplaceFormat:=False, FormulaVersion:=xlReplaceFormula2
+
+        
+Next
+    
+       
+End Sub

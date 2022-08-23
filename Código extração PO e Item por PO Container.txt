@@ -1,0 +1,59 @@
+Sub Po_Linha()
+
+
+Dim fup, base As Worksheet
+
+Dim valor As String
+
+Dim adrss As Single
+
+Dim v1() As String
+
+
+Set fup = Sheets("FUP CNTR")
+
+Set base = Sheets("Sheet1")
+
+
+n1 = fup.Cells(Rows.Count, 1).End(xlUp).Row
+
+n2 = base.Cells(Rows.Count, 1).End(xlUp).Row
+
+On Error Resume Next
+
+For i = 2 To n1
+
+    quantidade = Application.WorksheetFunction.CountIf(base.Range("A:A"), fup.Range("A" & i))
+    
+    repeticao = 0
+    
+    Erase v1
+    ReDim v1(1 To quantidade)
+    
+    adrss = 1
+    
+    valor = ""
+    
+    For k = 1 To quantidade
+    
+        adrss = base.Range("A" & adrss & ":D" & n2).Find(fup.Range("A" & i)).Row
+        
+        If Application.WorksheetFunction.IfError(Application.WorksheetFunction.Match(Application.WorksheetFunction.VLookup(fup.Range("A" & i).Value, base.Range("A" & adrss & ":C" & n2), 2, 0) & "/" & Application.WorksheetFunction.VLookup(fup.Range("A" & i).Value, base.Range("A" & adrss & ":C" & n2), 3, 0), v1(), 0), 0) = 0 Then
+        
+            v1(k) = Application.WorksheetFunction.VLookup(fup.Range("A" & i).Value, base.Range("A" & adrss & ":C" & n2), 2, 0) & "/" & Application.WorksheetFunction.VLookup(fup.Range("A" & i).Value, base.Range("A" & adrss & ":C" & n2), 3, 0)
+            
+            If valor = "" Then
+                valor = v1(k)
+                    Else
+                       valor = valor & " - " & v1(k)
+            End If
+        End If
+    Next
+    
+    fup.Range("B" & i) = valor
+    
+Next
+
+
+End Sub
+

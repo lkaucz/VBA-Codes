@@ -1,0 +1,14 @@
+If Not IsObject(App) Then
+   Set SapGuiAuto = GetObject("SAPGUI")
+   Set App = SapGuiAuto.GetScriptingEngine
+End If
+If Not IsObject(Connection) Then
+   Set Connection = App.Children(0)
+End If
+If Not IsObject(session) Then
+   Set session = Connection.Children(0)
+End If
+If IsObject(WScript) Then
+   WScript.ConnectObject session, "on"
+   WScript.ConnectObject App, "on"
+End If
