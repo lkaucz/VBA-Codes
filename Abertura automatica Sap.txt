@@ -1,0 +1,225 @@
+'======================================= Variáveis Globais e Constantes =======================================
+Private Const sSAPConnectionName = "01 : RP1 - AKSO S/4 HANA 2020 Production System"
+Sub main()
+
+    Dim st As Double, en As Double, re As Double
+    
+    'st = Timer  'marca o tempo de início de execução do código
+    
+    With Application
+        .DisplayAlerts = False  'desliga alertas que possam impossibilitar a fluidez
+        .ScreenUpdating = False 'desliga atualização da tela, aumentando a velocidade de processamento
+    
+        'call macros
+        
+        .DisplayAlerts = True   'religa alertas
+        .ScreenUpdating = True  'religa atualização de tela
+    End With
+    
+    'en = Timer  'marca o tempo de término de execução do código
+    
+    're = Round(en - st, 2)      'calcula o tempo de execução
+    'Debug.Print re              'disponibiliza informação na Tela Imediata (Ctrl + G)
+    
+    ActiveWorkbook.Saved = True
+
+    fecharExcel 'salva e fecha o arquivo
+    
+End Sub
+
+'Rotina para executar SAP Script gravado dentro do próprio SAP GUI
+'com algumas tratativas adaptadas para situações em que o SAP esteja fechado, por exemplo
+
+Private Sub SAP()
+
+    
+    Dim oSAPApp, oSAPConnection, oSAPSession
+    Dim WScript
+     
+    Set oSAPApp = getSAPApp                         'Abre o SAP
+    Set oSAPConnection = getSAPConnection(oSAPApp)  'Conecta ao servidor desejado (no caso, RP1)
+    Set session = oSAPConnection.Children(0)    'Define sessão do SAP
+    
+    If IsObject(WScript) Then
+       WScript.ConnectObject oSAPSession, "on"
+       WScript.ConnectObject oSAPApp, "on"
+    End If
+    
+'======================================= Customizável  =======================================
+
+   CÓDIGO SAP SCRIPT
+
+
+'======================================= Customizável ^ =======================================
+    
+    'Limpa o cache
+    Set oSAPApp = Nothing
+    Set oSAPConnection = Nothing
+    Set oSAPSession = Nothing
+    
+End Sub
+'Rotina para executar SAP Script gravado dentro do próprio SAP GUI
+'com algumas tratativas adaptadas para situações em que o SAP esteja fechado, por exemplo
+
+
+'Função para retornar o objeto da aplicação do SAP
+'Caso esteja fechado, abre o SAP
+Private Function getSAPApp() As Object
+    
+    Dim oSAPGuiAuto, oSAPApp
+    Dim wscriptShell
+    
+    Set wscriptShell = CreateObject("WScript.Shell")
+    
+    'Desliga o aviso de erro
+    On Error Resume Next
+    
+        'Tenta definir a aplicação do SAP
+        Set oSAPGuiAuto = GetObject("SAPGUI")
+        Set oSAPApp = oSAPGuiAuto.GetScriptingEngine
+        
+        'Se o SAP não estiver aberto, as operações anteriores dão erro. O que é avaliado em seguida
+        If Err <> 0 Then
+            'Caso o SAP não esteja aberto:
+            
+            'Abre o SAP
+            wscriptShell.Exec sSAPPath & "saplogon.exe"
+            
+            'Aguarda a abertura
+            Do Until wscriptShell.AppActivate("SAP Logon ")
+                Application.Wait Now + TimeValue("0:00:01")
+            Loop
+            
+            'Define a aplicação
+            Set oSAPGuiAuto = GetObject("SAPGUI")
+            Set oSAPApp = oSAPGuiAuto.GetScriptingEngine
+        End If
+    
+    'Liga os avisos de erro
+    On Error GoTo 0
+    
+    'Retorno da função: objeto da aplicação do SAP GUI
+    Set getSAPApp = oSAPApp
+    
+    'Limpa o cache
+    Set oSAPGuiAuto = Nothing
+    Set oSAPApp = Nothing
+    Set wscriptShell = Nothing
+    
+End Function
+
+'Função para retornar o objeto da conexão do SAP
+'Caso esteja fechado, abre conexão
+Private Function getSAPConnection(ByVal oSAPApp As Object) As Object
+    
+    Dim oSAPConnection
+    Dim wscriptShell
+    
+    Set wscriptShell = CreateObject("WScript.Shell")
+    
+    'Desliga o aviso de erro
+    On Error Resume Next
+    
+        'Tenta definir a conexão do SAP
+        Set oSAPConnection = oSAPApp.Children(0)
+        
+        'Se a conexão não estiver aberta, a operação anterior dá erro. O que é avaliado em seguida
+        If Err <> 0 Then
+            
+            'Abre a conexão
+            Set oSAPConnection = oSAPApp.OpenConnection(sSAPConnectionName)
+            
+            'Aguarda a abertura
+            Do Until wscriptShell.AppActivate("SAP Easy Access")
+                Application.Wait Now + TimeValue("0:00:01")
+            Loop
+            
+        End If
+    
+    'Liga os avisos de erro
+    On Error GoTo 0
+    
+    'Retorno da função: objeto de conexão do SAP GUI
+    Set getSAPConnection = oSAPConnection
+    
+    'Limpa o cache
+    Set oSAPConnection = Nothing
+    Set wscriptShell = Nothing
+    
+End Function
+
+'Subrotina responsável por fechar o SAP, desde sua conexão a sua aplicação, liberando a memória do PC
+Private Sub fecharSAP()
+
+    Dim oProcList As Object, oWMI As Object, oProc As Object
+    Dim sSAPLogon As String
+    
+    sSAPLogon = "saplogon.exe"  'Nome do processo do SAP para ser finalizado
+    
+    'Define um objeto do windows que contém os processos
+    Set oWMI = GetObject("winmgmts:")
+    
+    'Se definido corretamente
+    If Not IsNull(oWMI) Then
+        
+        'Define lista de processos abertos no windows
+        Set oProcList = oWMI.InstancesOf("win32_process")
+        
+        'Itera pela lista de processos
+        For Each oProc In oProcList
+        
+            'Se o nome do processo iterado é igual ao do SAP Logon
+            If UCase(oProc.Name) = UCase(sSAPLogon) Then
+            
+                'Finaliza o processo
+                oProc.Terminate (0)
+            End If
+        Next
+    End If
+    
+    'Limpa o cache
+    Set oProcList = Nothing
+    Set oWMI = Nothing
+    Set oProc = Nothing
+    
+End Sub
+
+'Subrotina que salva o arquivo atual e fecha o Excel
+Private Sub fecharExcel()
+
+    ThisWorkbook.Save
+    Application.Quit
+
+End Sub
+Private Function getSharepointFolder() As String
+
+
+
+Const tempPath = "C:\Users\#\caminho"
+Dim sStartOfThePath As String, sAux As String
+Dim sCompletePath As String
+
+sAux = Application.UserLibraryPath
+sAux = Mid(sAux, 10, 6)
+sCompletePath = Replace(tempPath, "#", sAux)
+
+getSharepointFolder = sCompletePath
+
+
+End Function
+
+Private Function screen_sap(ByRef session) As String
+
+Dim UserArea
+
+Set UserArea = session.findById("wnd[0]/usr")
+
+For Z = 0 To UserArea.Children.Count - 1
+    If InStr(UserArea.Children(CInt(Z)).Name, "SAPLMEGUI:") Then
+        screen_sap = UserArea.Children(CInt(Z)).Name
+    End If
+Next
+
+End Function
+
+
