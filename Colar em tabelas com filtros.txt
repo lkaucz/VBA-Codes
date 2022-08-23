@@ -5,19 +5,22 @@ dim copiar,colar as range
 Application.DisplayAlerts = False
 
 On Error Resume Next
+
 Set copiar = Application.InputBox("Selecione o intervalo de células para copiar", "CTRL C", Type:=8)
+
 Set colar = Application.InputBox("Selecione o intervalo de células para colar", "CTRL V", Type:=8)
+
 For Each Cell In copiar
-Cell.Copy
-For Each cell2 In colar
-If cell2.EntireRow.RowHeight > 0 Then
-On Error Resume Next
-cell2.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
-        :=False, Transpose:=False
-Set colar = cell2.Offset(1).Resize(colar.Rows.Count)
-Exit For
-End If
-Next
+        Cell.Copy
+        For Each cell2 In colar
+                If cell2.EntireRow.RowHeight > 0 Then
+                        On Error Resume Next
+                        cell2.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+                                :=False, Transpose:=False
+                        Set colar = cell2.Offset(1).Resize(colar.Rows.Count)
+                        Exit For
+                        End If
+        Next
 Next
 
 Application.DisplayAlerts = True
